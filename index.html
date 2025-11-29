@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Wavelength</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      background: #ffffff;
+      padding: 20px 24px;
+      max-width: 700px;
+      width: 100%;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-top: 0;
+      text-align: center;
+    }
+
+    .section {
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .section:last-of-type {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 0;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 0.95rem;
+    }
+
+    .scoreboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 8px;
+    }
+
+    .team-card {
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      transition: box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .team-card.active-team {
+      border-color: #2563eb;
+      background: #eff6ff;
+      box-shadow: 0 0 0 2px rgba(37,99,235,0.4);
+    }
+
+    .team-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .team-name-input {
+      border-radius: 999px;
+      padding: 4px 8px;
+      border: 1px solid #d1d5db;
+      font-size: 0.85rem;
+      width: 70%;
+    }
+
+    .team-score-input {
+      width: 64px;
+      text-align: right;
+      font-size: 1.25rem;
+      font-weight: 700;
+      border: none;
+      background: transparent;
+      outline: none;
+      -moz-appearance: textfield;
+    }
+    .team-score-input::-webkit-outer-spin-button,
+    .team-score-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .active-team-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background: #e5e7eb;
+      color: #111827;
+      margin-top: 4px;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .active-team-pill.active-pill {
+      background: #2563eb;
+      color: #ffffff;
+    }
+
+    .winner-banner {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #facc15;
+      color: #78350f;
+      font-weight: 700;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+
+    .scoreboard-controls {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .scoreboard-controls label {
+      margin-bottom: 0;
+      font-size: 0.85rem;
+    }
+
+    #winningScoreInput {
+      width: 70px;
+      padding: 4px 6px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      font-size: 0.85rem;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    /* Color gradient slider styling */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      flex: 1;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg,
+        #4f46e5 0%,
+        #0ea5e9 20%,
+        #14b8a6 40%,
+        #eab308 60%,
+        #f97316 80%,
+        #ec4899 100%
+      );
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 2px solid #111827;
+      cursor: pointer;
+      box-shadow: 0 0 3px rgba(0,0,0,0.5);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 2px solid #111827;
+      cursor: pointer;
+      box-shadow: 0 0 3px rgba(0,0,0,0.5);
+    }
+
+    input[type="range"]::-moz-range-track {
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg,
+        #4f46e5 0%,
+        #0ea5e9 20%,
+        #14b8a6 40%,
+        #eab308 60%,
+        #f97316 80%,
+        #ec4899 100%
+      );
+    }
+
+    .value-badge {
+      min-width: 40px;
+      text-align: center;
+      padding: 4px 8px;
+      background: #eee;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      background: #2563eb;
+      color: white;
+      transition: transform 0.05s ease, box-shadow 0.1s ease, background 0.15s ease;
+    }
+
+    button.secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+
+    button:not(:disabled):hover {
+      background: #1d4ed8;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);
+      transform: translateY(-1px);
+    }
+
+    button.secondary:not(:disabled):hover {
+      background: #d1d5db;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+    }
+
+    .target-display {
+      font-size: 1.1rem;
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: #f9fafb;
+      display: inline-block;
+      margin-top: 6px;
+    }
+
+    .results {
+      margin-top: 8px;
+      font-size: 0.98rem;
+      line-height: 1.4;
+    }
+
+    .results span {
+      display: block;
+      margin-top: 4px;
+    }
+
+    .points {
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    select {
+      padding: 6px 8px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      font-size: 0.85rem;
+      background: #fff;
+    }
+
+    /* Difficulty buttons */
+    .difficulty-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .difficulty-buttons {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .difficulty-btn {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      background: #f3f4f6;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    .difficulty-btn.active-difficulty {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px rgba(37,99,235,0.6);
+    }
+
+    /* Dial styles: half-circle with matching gradient */
+    .dial-wrapper {
+      margin-top: 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .dial {
+      position: relative;
+      width: 240px;
+      height: 120px;
+      border-radius: 120px 120px 0 0;
+      background: linear-gradient(90deg,
+        #4f46e5 0%,
+        #0ea5e9 20%,
+        #14b8a6 40%,
+        #eab308 60%,
+        #f97316 80%,
+        #ec4899 100%
+      );
+      border: 4px solid #111827;
+      border-bottom: none;
+      overflow: hidden;
+    }
+
+    .dial-ticks {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .dial-tick {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 3px;
+      height: 120px;    /* full radius */
+      border-radius: 999px;
+      transform-origin: bottom center;
+      background: #ffffff;
+      box-shadow: 0 0 3px rgba(0,0,0,0.7);
+    }
+
+    .dial-tick.zone4 { background: #22c55e; } /* ±2 → 4 pts */
+    .dial-tick.zone3 { background: #0ea5e9; } /* ±5 → 3 pts */
+    .dial-tick.zone2 { background: #eab308; } /* ±8 → 2 pts */
+    .dial-tick.zone1 { background: #ef4444; } /* ±11 → 1 pt */
+    .dial-tick.center {
+      background: #111827;
+      width: 4px;
+      height: 120px;
+    }
+
+    .dial-needle {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 4px;
+      height: 90px;
+      background: #111827;
+      border-radius: 999px;
+      transform-origin: bottom center;
+      transform: rotate(0deg);
+      box-shadow: 0 0 5px rgba(0,0,0,0.7);
+    }
+
+    .dial-center {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #f9fafb;
+      border: 2px solid #111827;
+      bottom: -1px;
+      left: calc(50% - 8px);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Wavelength</h1>
+
+    <!-- SCOREBOARD -->
+    <div class="section">
+      <label>Scoreboard</label>
+      <div class="scoreboard-grid">
+        <div class="team-card" id="teamACard">
+          <div class="team-header">
+            <input id="teamAName" class="team-name-input" type="text" value="Team A" />
+            <input id="teamAScore" class="team-score-input" type="number" min="0" value="0" />
+          </div>
+          <div class="active-team-pill" id="teamAIndicator">Not guessing this round</div>
+        </div>
+
+        <div class="team-card" id="teamBCard">
+          <div class="team-header">
+            <input id="teamBName" class="team-name-input" type="text" value="Team B" />
+            <input id="teamBScore" class="team-score-input" type="number" min="0" value="0" />
+          </div>
+          <div class="active-team-pill" id="teamBIndicator">Not guessing this round</div>
+        </div>
+      </div>
+
+      <div class="scoreboard-controls">
+        <div>
+          <label for="activeTeamSelect">Which team is guessing this round?</label>
+          <select id="activeTeamSelect"></select>
+        </div>
+        <div>
+          <label for="winningScoreInput">Play to:</label>
+          <input id="winningScoreInput" type="number" min="1" max="100" value="10" />
+          <span style="font-size:0.8rem; color:#6b7280;">points</span>
+        </div>
+        <div class="buttons">
+          <button id="newGameBtn" class="secondary" type="button">New Game</button>
+        </div>
+      </div>
+
+      <div id="winnerBanner" class="winner-banner" style="display:none;"></div>
+
+      <p class="hint">
+        “New Game” resets everything (names, scores, target, and winning score).  
+        “Reset Scores” only clears scores and winner, keeping team names and winning score.
+      </p>
+    </div>
+
+    <!-- SPECTRUM + DIFFICULTY -->
+    <div class="section">
+      <label for="spectrum">Spectrum / Card</label>
+      <input id="spectrum" type="text" placeholder="e.g., Hot ←→ Cold" />
+
+      <div class="difficulty-row">
+        <span style="font-size:0.85rem; font-weight:600;">Difficulty:</span>
+        <div class="difficulty-buttons">
+          <button type="button" class="difficulty-btn" data-difficulty="easy" id="easyBtn">
+            Easy
+          </button>
+          <button type="button" class="difficulty-btn active-difficulty" data-difficulty="medium" id="mediumBtn">
+            Medium
+          </button>
+          <button type="button" class="difficulty-btn" data-difficulty="hard" id="hardBtn">
+            Hard
+          </button>
+        </div>
+      </div>
+
+      <div class="buttons" style="margin-top:8px;">
+        <button id="newDichotomyBtn" type="button" class="secondary">New Card</button>
+      </div>
+
+      <p class="hint">
+        Start of each round: the guessing team chooses a difficulty, then click “New Card”
+        to reveal a card. You can click it again to reshuffle a new one (same difficulty).
+      </p>
+    </div>
+
+    <!-- TARGET -->
+    <div class="section">
+      <label>Target (for clue-giver)</label>
+      <div class="target-display">
+        Target position: <strong id="targetValue" data-visible="false">???</strong> / 100
+      </div>
+      <div class="buttons">
+        <button id="newRoundBtn" class="secondary" type="button">New Round</button>
+        <button id="toggleTargetBtn" type="button">Show/Hide Target</button>
+        <button id="resetScoresBtn" class="secondary" type="button">Reset Scores</button>
+      </div>
+      <p class="hint">
+        Only the clue-giver should look when showing the target. Everyone else, look away or hide the window.
+      </p>
+    </div>
+
+    <!-- GUESSING -->
+    <div class="section">
+      <label>Your Guess</label>
+      <div class="slider-row">
+        <input id="guessSlider" type="range" min="0" max="100" value="50" />
+        <div class="value-badge" id="guessValue">50</div>
+      </div>
+
+      <!-- Dial visualization -->
+      <div class="dial-wrapper">
+        <div class="dial">
+          <div class="dial-ticks" id="dialTicks"></div>
+          <div class="dial-needle" id="dialNeedle"></div>
+          <div class="dial-center"></div>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button id="submitGuessBtn" type="button">Submit Guess</button>
+      </div>
+
+      <div class="results" id="resultsBox" style="display:none;">
+        <span id="revealText"></span>
+        <span id="differenceText"></span>
+        <span class="points" id="pointsText"></span>
+        <span id="scoreboardUpdateText"></span>
+      </div>
+
+      <p class="hint">
+        Scoring:<br />
+        • ≤ 2 away: 4 points<br />
+        • 3–5 away: 3 points<br />
+        • 6–8 away: 2 points<br />
+        • 9–11 away: 1 point<br />
+        • &gt; 11 away: 0 points
+      </p>
+    </div>
+  </div>
+
+  <script>
+    /* ---------------- DICHOTOMY LISTS ---------------- */
+
+    const easyDichotomies = [
+      ["Cold","Hot"],
+      ["Light","Dark"],
+      ["Wet","Dry"],
+      ["Hard","Soft"],
+      ["Round","Square"],
+      ["Pointy","Round"],
+      ["Spicy","Mild"],
+      ["Firm","Limp"],
+      ["Scented","Unscented"],
+      ["Vertical","Horizontal"],
+      ["Tastes good","Tastes bad"],
+      ["Smells good","Smells bad"],
+      ["Clean","Dirty"],
+      ["Healthy","Unhealthy"],
+      ["Fancy","Plain"],
+      ["High quality","Low quality"],
+      ["Smooth","Rough"],
+      ["Useful","Useless"],
+      ["Important","Unimportant"],
+      ["Hard to do","Easy to do"],
+      ["Good for you","Bad for you"],
+      ["Good gift","Bad gift"],
+      ["Good candy","Bad candy"],
+      ["Feels good","Feels bad"],
+      ["Easy to use","Difficult to use"],
+      ["Easy to remember","Hard to remember"],
+      ["Easy to pronounce","Hard to pronounce"],
+      ["Easy to sit on","Hard to sit on"],
+      ["Too big","Too small"],
+      ["Long","Short"],
+      ["Too much","Not enough"],
+      ["Meal","Snack"],
+      ["Film","Movie"],
+      ["Drama","Comedy"],
+      ["Dog person","Cat person"],
+      ["Extrovert","Introvert"],
+      ["Dork","Geek"],
+      ["Cool","Uncool"],
+      ["Fashionable","Unfashionable"],
+      ["Happy song","Sad song"],
+      ["Happy movie","Sad movie"],
+      ["Good movie","Bad movie"],
+      ["Good actor","Bad actor"],
+      ["Good music","Bad music"],
+      ["Good TV show","Bad TV show"],
+      ["Wet food","Dry food"],
+      ["Smelly (good)","Smelly (bad)"],
+      ["Game","Sport"],
+      ["Clean food","Messy food"],
+      ["Tiny","Small"],
+      ["Vegetable","Fruit"],
+      ["Strange","Weird"],
+      ["Cat name","Dog name"]
+    ];
+
+    const mediumDichotomies = [
+      ["Colorful","Colorless"],
+      ["Expensive","Cheap"],
+      ["Common","Rare"],
+      ["Famous","Unknown"],
+      ["Durable","Fragile"],
+      ["Best day of the year","Worst day of the year"],
+      ["Good habit","Bad habit"],
+      ["Talented","Untalented"],
+      ["Classy","Not classy"],
+      ["Flexible","Inflexible"],
+      ["Exotic pet","Normal pet"],
+      ["Adventure movie","Action movie"],
+      ["Want","Need"],
+      ["Weird thing to own","Normal thing to own"],
+      ["Mandatory","Optional"],
+      ["Extraordinary","Ordinary"],
+      ["Fancy","Plain"],
+      ["Good reputation","Bad reputation"],
+      ["Well made","Poorly made"],
+      ["A sandwich","Not a sandwich"],
+      ["Loud place","Quiet place"],
+      ["Safe","Dangerous"],
+      ["Irreplaceable","Replaceable"],
+      ["Overrated","Underrated"],
+      ["Forgiveable","Unforgiveable"],
+      ["Homogeneous","Heterogeneous"],
+      ["Popular","Unpopular"],
+      ["Beautiful word","Ugly word"],
+      ["Natural","Unnatural"],
+      ["Original","Derivative"],
+      ["Benefits everyone","Benefits you"],
+      ["Powerful","Powerless"],
+      ["Serious topic","Funny topic"],
+      ["News","Gossip"],
+      ["Exclusive","Inclusive"],
+      ["Unexpected","Expected"],
+      ["Hard subject","Easy subject"],
+      ["Smooth","Rough"],
+      ["Overrated movie","Underrated movie"],
+      ["Everybody does it","Nobody does it"],
+      ["Round","Square"],
+      ["Better cold","Better hot"],
+      ["Haute cuisine","Basic food"],
+      ["Effective","Ineffective"],
+      ["Permanent","Temporary"],
+      ["Doesn’t look like a person","Looks like a person"],
+      ["Tastes good","Tastes bad"],
+      ["Popular activity","Unpopular activity"],
+      ["Whole","Divided"],
+      ["Reliable","Unreliable"],
+      ["Stable","Unstable"],
+      ["Pointy animal","Round animal"],
+      ["Classic","Fad"],
+      ["Useful invention","Useless invention"],
+      ["Exciting","Boring"],
+      ["Overrated thing to do","Underrated thing to do"],
+      ["Useful in an emergency","Useless in an emergency"],
+      ["Priceless","Worthless"],
+      ["Weird greeting","Normal greeting"],
+      ["Formal event","Casual event"],
+      ["Good investment","Bad investment"],
+      ["Best chore","Worst chore"],
+      ["Overrated book","Underrated book"],
+      ["Overrated game","Underrated game"]
+    ];
+
+    const hardDichotomies = [
+      ["Essential","Inessential"],
+      ["Flavorful","Flavorless"],
+      ["Fascinating topic","Boring topic"],
+      ["Sci-Fi","Fantasy"],
+      ["Overpaid","Underpaid"],
+      ["Overrated skill","Underrated skill"],
+      ["Encouraged","Forbidden"],
+      ["Historically irrelevant","Historically important"],
+      ["Movie was better","Book was better"],
+      ["Career","Job"],
+      ["Hated","Loved"],
+      ["Dark Side of the Force","Light Side of the Force"],
+      ["Utopia","Dystopia"],
+      ["Overrated thing to own","Underrated thing to own"],
+      ["Physical activity","Mental activity"],
+      ["Controversial topic","Uncontroversial topic"],
+      ["Overrated letter","Underrated letter"],
+      ["Fancy","Plain"],
+      ["Culturally insignificant","Culturally significant"],
+      ["Greatest athlete","Worst athlete"],
+      ["Bad influence","Role model"],
+      ["Useful major","Useless major"],
+      ["Good use of time","Waste of time"],
+      ["Star Trek","Star Wars"],
+      ["Mass-produced","Artisanal"],
+      ["Good superpower","Bad superpower"],
+      ["Believable","Unbelievable"],
+      ["Movie Godzilla improves","Movie Godzilla ruins"],
+      ["Virtue","Vice"],
+      ["Overrated musician","Underrated musician"],
+      ["Nurture","Nature"],
+      ["Infinite","Limited"],
+      ["Public knowledge","Secret"],
+      ["Best year","Worst year"],
+      ["Well-known fact","Little-known fact"],
+      ["Mobile","Stationary"],
+      ["Skill","Talent"],
+      ["Best era to travel to","Worst era to travel to"],
+      ["The best","The worst"],
+      ["Large number","Small number"],
+      ["Avant-garde","Old-fashioned"],
+      ["Pseudoscience","Science"],
+      ["Commerce","Art"],
+      ["Good advice","Bad advice"],
+      ["Radical","Traditional"],
+      ["Shallow thought","Deep thought"],
+      ["Good school","Bad school"],
+      ["Always on time","Never on time"],
+      ["Good Disney character","Bad Disney character"]
+    ];
+
+    /* ---------------- GAME STATE ---------------- */
+
+    let target = null;
+    let roundComplete = false;
+    let gameOver = false;
+    let scores = { A: 0, B: 0 };
+    let currentDifficulty = "medium";
+
+    const teamACard = document.getElementById("teamACard");
+    const teamBCard = document.getElementById("teamBCard");
+    const teamANameInput = document.getElementById("teamAName");
+    const teamBNameInput = document.getElementById("teamBName");
+    const teamAScoreEl = document.getElementById("teamAScore");
+    const teamBScoreEl = document.getElementById("teamBScore");
+    const activeTeamSelect = document.getElementById("activeTeamSelect");
+    const winningScoreInput = document.getElementById("winningScoreInput");
+    const teamAIndicator = document.getElementById("teamAIndicator");
+    const teamBIndicator = document.getElementById("teamBIndicator");
+    const winnerBanner = document.getElementById("winnerBanner");
+
+    const guessSlider = document.getElementById("guessSlider");
+    const guessValue = document.getElementById("guessValue");
+    const dialNeedle = document.getElementById("dialNeedle");
+    const dialTicks = document.getElementById("dialTicks");
+
+    const newRoundBtn = document.getElementById("newRoundBtn");
+    const toggleTargetBtn = document.getElementById("toggleTargetBtn");
+    const resetScoresBtn = document.getElementById("resetScoresBtn");
+    const newGameBtn = document.getElementById("newGameBtn");
+    const submitGuessBtn = document.getElementById("submitGuessBtn");
+    const newDichotomyBtn = document.getElementById("newDichotomyBtn");
+
+    const targetEl = document.getElementById("targetValue");
+    const resultsBox = document.getElementById("resultsBox");
+    const revealText = document.getElementById("revealText");
+    const differenceText = document.getElementById("differenceText");
+    const pointsText = document.getElementById("pointsText");
+    const scoreboardUpdateText = document.getElementById("scoreboardUpdateText");
+    const spectrumInput = document.getElementById("spectrum");
+
+    const difficultyButtons = document.querySelectorAll(".difficulty-btn");
+
+    function getWinningScore() {
+      let val = parseInt(winningScoreInput.value, 10);
+      if (isNaN(val) || val < 1) {
+        val = 10;
+        winningScoreInput.value = "10";
+      }
+      return val;
+    }
+
+    function angleFromValue(v) {
+      // Map 0–100 to -90° to +90°
+      return (v / 100) * 180 - 90;
+    }
+
+    function updateDialFromValue(value) {
+      dialNeedle.style.transform = `rotate(${angleFromValue(value)}deg)`;
+    }
+
+    function refreshTeamDropdown() {
+      const aName = teamANameInput.value || "Team A";
+      const bName = teamBNameInput.value || "Team B";
+      const current = activeTeamSelect.value;
+
+      activeTeamSelect.innerHTML = `
+        <option value="A">${aName}</option>
+        <option value="B">${bName}</option>
+      `;
+
+      activeTeamSelect.value = current === "B" ? "B" : "A";
+      updateScoreDisplay();
+    }
+
+    function updateScoreDisplay() {
+      const aName = teamANameInput.value || "Team A";
+      const bName = teamBNameInput.value || "Team B";
+      const active = activeTeamSelect.value;
+
+      teamAScoreEl.value = scores.A;
+      teamBScoreEl.value = scores.B;
+
+      teamAIndicator.textContent =
+        active === "A"
+          ? `${aName} is guessing this round`
+          : `${aName} is not guessing this round`;
+
+      teamBIndicator.textContent =
+        active === "B"
+          ? `${bName} is guessing this round`
+          : `${bName} is not guessing this round`;
+
+      if (active === "A") {
+        teamACard.classList.add("active-team");
+        teamBCard.classList.remove("active-team");
+        teamAIndicator.classList.add("active-pill");
+        teamBIndicator.classList.remove("active-pill");
+      } else {
+        teamBCard.classList.add("active-team");
+        teamACard.classList.remove("active-team");
+        teamBIndicator.classList.add("active-pill");
+        teamAIndicator.classList.remove("active-pill");
+      }
+    }
+
+    function buildTicksForTarget() {
+      dialTicks.innerHTML = "";
+      if (target === null) return;
+
+      const centerTick = document.createElement("div");
+      centerTick.className = "dial-tick center";
+      centerTick.style.transform = `rotate(${angleFromValue(target)}deg)`;
+      dialTicks.appendChild(centerTick);
+
+      const zones = [
+        { d: 2, cls: "zone4" },
+        { d: 5, cls: "zone3" },
+        { d: 8, cls: "zone2" },
+        { d: 11, cls: "zone1" },
+      ];
+
+      zones.forEach(({ d, cls }) => {
+        [-1, 1].forEach(sign => {
+          const v = target + sign * d;
+          if (v < 0 || v > 100) return;
+          const tick = document.createElement("div");
+          tick.className = "dial-tick " + cls;
+          tick.style.transform = `rotate(${angleFromValue(v)}deg)`;
+          dialTicks.appendChild(tick);
+        });
+      });
+    }
+
+    function pickRandomDichotomy() {
+      let list;
+      if (currentDifficulty === "easy") list = easyDichotomies;
+      else if (currentDifficulty === "hard") list = hardDichotomies;
+      else list = mediumDichotomies;
+
+      const idx = Math.floor(Math.random() * list.length);
+      const [left, right] = list[idx];
+      spectrumInput.value = `${left} \u2194 ${right}`;
+    }
+
+    function generateNewTarget() {
+      if (gameOver) return;
+
+      target = Math.floor(Math.random() * 101);
+      roundComplete = false;
+
+      targetEl.dataset.visible = "false";
+      targetEl.textContent = "???";
+
+      guessSlider.value = 50;
+      guessValue.textContent = "50";
+      updateDialFromValue(50);
+
+      resultsBox.style.display = "none";
+
+      submitGuessBtn.disabled = false;
+      toggleTargetBtn.disabled = false;
+
+      buildTicksForTarget();
+      dialTicks.style.opacity = 0;
+    }
+
+    function toggleTargetVisibility() {
+      if (target === null || gameOver) return;
+      const isVisible = targetEl.dataset.visible === "true";
+      if (isVisible) {
+        targetEl.dataset.visible = "false";
+        targetEl.textContent = "???";
+        dialTicks.style.opacity = 0;
+      } else {
+        targetEl.dataset.visible = "true";
+        targetEl.textContent = target;
+        buildTicksForTarget();
+        dialTicks.style.opacity = 1;
+      }
+    }
+
+    function scoreGuess(guess, target) {
+      const diff = Math.abs(guess - target);
+      let points;
+      if (diff <= 2) points = 4;
+      else if (diff <= 5) points = 3;
+      else if (diff <= 8) points = 2;
+      else if (diff <= 11) points = 1;
+      else points = 0;
+      return { diff, points };
+    }
+
+    function checkForWinner() {
+      if (gameOver) return;
+      const winningScore = getWinningScore();
+      const aName = teamANameInput.value || "Team A";
+      const bName = teamBNameInput.value || "Team B";
+
+      let winnerName = null;
+
+      if (scores.A >= winningScore && scores.B >= winningScore) {
+        winnerName = scores.A >= scores.B ? aName : bName;
+      } else if (scores.A >= winningScore) {
+        winnerName = aName;
+      } else if (scores.B >= winningScore) {
+        winnerName = bName;
+      }
+
+      if (winnerName) {
+        gameOver = true;
+        winnerBanner.textContent = `${winnerName} wins! First to ${winningScore} points 🎉`;
+        winnerBanner.style.display = "block";
+        newRoundBtn.disabled = true;
+        submitGuessBtn.disabled = true;
+        toggleTargetBtn.disabled = true;
+      }
+    }
+
+    function handleSubmitGuess() {
+      if (roundComplete || target === null || gameOver) return;
+
+      const guess = parseInt(guessSlider.value, 10);
+      const { diff, points } = scoreGuess(guess, target);
+
+      targetEl.dataset.visible = "true";
+      targetEl.textContent = target;
+      buildTicksForTarget();
+      dialTicks.style.opacity = 1;
+
+      const active = activeTeamSelect.value;
+      const aName = teamANameInput.value || "Team A";
+      const bName = teamBNameInput.value || "Team B";
+      const activeName = active === "A" ? aName : bName;
+
+      scores[active] += points;
+      updateScoreDisplay();
+
+      revealText.textContent = `Guess: ${guess} / Target: ${target}`;
+      differenceText.textContent = `Difference: ${diff}`;
+      pointsText.textContent = `Points this round: ${points}`;
+      scoreboardUpdateText.textContent =
+        `${activeName} now has ${scores[active]} point(s).`;
+
+      resultsBox.style.display = "block";
+
+      roundComplete = true;
+      submitGuessBtn.disabled = true;
+      toggleTargetBtn.disabled = true;
+
+      checkForWinner();
+    }
+
+    function resetScores() {
+      scores = { A: 0, B: 0 };
+      teamAScoreEl.value = "0";
+      teamBScoreEl.value = "0";
+      gameOver = false;
+      roundComplete = false;
+      winnerBanner.style.display = "none";
+      winnerBanner.textContent = "";
+      scoreboardUpdateText.textContent = "";
+      resultsBox.style.display = "none";
+      newRoundBtn.disabled = false;
+      submitGuessBtn.disabled = false;
+      toggleTargetBtn.disabled = false;
+      generateNewTarget();
+      updateScoreDisplay();
+    }
+
+    function newGame() {
+      teamANameInput.value = "Team A";
+      teamBNameInput.value = "Team B";
+      scores = { A: 0, B: 0 };
+      teamAScoreEl.value = "0";
+      teamBScoreEl.value = "0";
+      winningScoreInput.value = "10";
+      spectrumInput.value = "";
+      gameOver = false;
+      roundComplete = false;
+
+      winnerBanner.style.display = "none";
+      winnerBanner.textContent = "";
+      scoreboardUpdateText.textContent = "";
+      resultsBox.style.display = "none";
+
+      newRoundBtn.disabled = false;
+      submitGuessBtn.disabled = false;
+      toggleTargetBtn.disabled = false;
+
+      // Reset difficulty to Medium
+      currentDifficulty = "medium";
+      difficultyButtons.forEach(b => b.classList.remove("active-difficulty"));
+      document.getElementById("mediumBtn").classList.add("active-difficulty");
+
+      refreshTeamDropdown();
+      activeTeamSelect.value = "A";
+      updateScoreDisplay();
+      generateNewTarget();
+    }
+
+    /* ---------------- EVENT LISTENERS ---------------- */
+
+    guessSlider.addEventListener("input", (e) => {
+      const val = parseInt(e.target.value, 10);
+      guessValue.textContent = val;
+      updateDialFromValue(val);
+    });
+
+    // New Round: switch teams, then new target (dichotomy chosen separately)
+    newRoundBtn.addEventListener("click", () => {
+      if (!gameOver) {
+        activeTeamSelect.value = activeTeamSelect.value === "A" ? "B" : "A";
+        updateScoreDisplay();
+      }
+      generateNewTarget();
+    });
+
+    toggleTargetBtn.addEventListener("click", toggleTargetVisibility);
+    submitGuessBtn.addEventListener("click", handleSubmitGuess);
+    resetScoresBtn.addEventListener("click", resetScores);
+    newGameBtn.addEventListener("click", newGame);
+
+    teamANameInput.addEventListener("input", refreshTeamDropdown);
+    teamBNameInput.addEventListener("input", refreshTeamDropdown);
+    activeTeamSelect.addEventListener("change", updateScoreDisplay);
+    winningScoreInput.addEventListener("change", getWinningScore);
+
+    // Manual score editing
+    teamAScoreEl.addEventListener("change", () => {
+      let v = parseInt(teamAScoreEl.value, 10);
+      if (isNaN(v) || v < 0) v = 0;
+      scores.A = v;
+      teamAScoreEl.value = v;
+      checkForWinner();
+      updateScoreDisplay();
+    });
+
+    teamBScoreEl.addEventListener("change", () => {
+      let v = parseInt(teamBScoreEl.value, 10);
+      if (isNaN(v) || v < 0) v = 0;
+      scores.B = v;
+      teamBScoreEl.value = v;
+      checkForWinner();
+      updateScoreDisplay();
+    });
+
+    // Difficulty buttons
+    difficultyButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        difficultyButtons.forEach(b => b.classList.remove("active-difficulty"));
+        btn.classList.add("active-difficulty");
+        currentDifficulty = btn.dataset.difficulty;
+      });
+    });
+
+    // New Card button
+    newDichotomyBtn.addEventListener("click", pickRandomDichotomy);
+
+    // Initialize
+    updateDialFromValue(50);
+    refreshTeamDropdown();
+    activeTeamSelect.value = "A";
+    updateScoreDisplay();
+    generateNewTarget();
+  </script>
+</body>
+</html>
