@@ -545,20 +545,19 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <script>
-    // 🔴 Paste YOUR Firebase config values here:
+    // Your Firebase config (already filled in with your values)
     const firebaseConfig = {
-  apiKey: "AIzaSyBxxMnSQIHU6f9ifpy_RYvUtZhcDQdj4Qg",
-  authDomain: "wavelength-game-48f1f.firebaseapp.com",
-  projectId: "wavelength-game-48f1f",
-  storageBucket: "wavelength-game-48f1f.firebasestorage.app",
-  messagingSenderId: "148853032160",
-  appId: "1:148853032160:web:8632440088b6d49148fc85",
-  measurementId: "G-NFE2JXDVGB"
-};
+      apiKey: "AIzaSyBxxMnSQIHU6f9ifpy_RYvUtZhcDQdj4Qg",
+      authDomain: "wavelength-game-48f1f.firebaseapp.com",
+      projectId: "wavelength-game-48f1f",
+      storageBucket: "wavelength-game-48f1f.firebasestorage.app",
+      messagingSenderId: "148853032160",
+      appId: "1:148853032160:web:8632440088b6d49148fc85",
+      measurementId: "G-NFE2JXDVGB"
+    };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    // shared game doc – everyone uses this same slider state
     const sliderDoc = db.collection("games").doc("main");
 
     /* ------------ Game state + DOM references ------------ */
@@ -690,8 +689,6 @@
         });
       });
     }
-
-    /* -------- Dichotomy lists (Easy / Medium / Hard) -------- */
 
     const easyDichotomies = [
       ["Cold","Hot"],["Light","Dark"],["Wet","Dry"],["Hard","Soft"],
@@ -826,7 +823,6 @@
       buildTicksForTarget();
       dialTicks.style.opacity = 0;
 
-      // reset shared slider to center (via Firestore)
       sliderDoc.set({ value: 50 });
     }
 
@@ -963,8 +959,6 @@
       generateNewTarget();
     }
 
-    /* -------- Real-time slider sync via Firestore -------- */
-
     let updatingFromFirestore = false;
 
     sliderDoc.onSnapshot(docSnap => {
@@ -990,8 +984,6 @@
         sliderDoc.set({ value: val });
       }
     });
-
-    /* -------- Other event listeners (local only) -------- */
 
     newRoundBtn.addEventListener("click", () => {
       if (!gameOver) {
@@ -1039,12 +1031,10 @@
 
     newDichotomyBtn.addEventListener("click", pickRandomDichotomy);
 
-    // Init UI
     updateDialFromValue(50);
     refreshTeamDropdown();
     activeTeamSelect.value = "A";
     updateScoreDisplay();
-    // first time: create target & center slider
     generateNewTarget();
   </script>
 </body>
