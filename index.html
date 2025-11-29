@@ -162,7 +162,6 @@
       margin-top: 8px;
     }
 
-    /* Color gradient slider styling */
     input[type="range"] {
       -webkit-appearance: none;
       appearance: none;
@@ -306,7 +305,6 @@
       background: #fff;
     }
 
-    /* Difficulty buttons */
     .difficulty-row {
       display: flex;
       flex-wrap: wrap;
@@ -337,7 +335,6 @@
       box-shadow: 0 0 0 1px rgba(37,99,235,0.6);
     }
 
-    /* Dial styles: half-circle with matching gradient */
     .dial-wrapper {
       margin-top: 16px;
       display: flex;
@@ -375,17 +372,17 @@
       bottom: 0;
       left: 50%;
       width: 3px;
-      height: 120px;    /* full radius */
+      height: 120px;
       border-radius: 999px;
       transform-origin: bottom center;
       background: #ffffff;
       box-shadow: 0 0 3px rgba(0,0,0,0.7);
     }
 
-    .dial-tick.zone4 { background: #22c55e; } /* ±2 → 4 pts */
-    .dial-tick.zone3 { background: #0ea5e9; } /* ±5 → 3 pts */
-    .dial-tick.zone2 { background: #eab308; } /* ±8 → 2 pts */
-    .dial-tick.zone1 { background: #ef4444; } /* ±11 → 1 pt */
+    .dial-tick.zone4 { background: #22c55e; }
+    .dial-tick.zone3 { background: #0ea5e9; }
+    .dial-tick.zone2 { background: #eab308; }
+    .dial-tick.zone1 { background: #ef4444; }
     .dial-tick.center {
       background: #111827;
       width: 4px;
@@ -473,15 +470,9 @@
       <div class="difficulty-row">
         <span style="font-size:0.85rem; font-weight:600;">Difficulty:</span>
         <div class="difficulty-buttons">
-          <button type="button" class="difficulty-btn" data-difficulty="easy" id="easyBtn">
-            Easy
-          </button>
-          <button type="button" class="difficulty-btn active-difficulty" data-difficulty="medium" id="mediumBtn">
-            Medium
-          </button>
-          <button type="button" class="difficulty-btn" data-difficulty="hard" id="hardBtn">
-            Hard
-          </button>
+          <button type="button" class="difficulty-btn" data-difficulty="easy" id="easyBtn">Easy</button>
+          <button type="button" class="difficulty-btn active-difficulty" data-difficulty="medium" id="mediumBtn">Medium</button>
+          <button type="button" class="difficulty-btn" data-difficulty="hard" id="hardBtn">Hard</button>
         </div>
       </div>
 
@@ -519,7 +510,6 @@
         <div class="value-badge" id="guessValue">50</div>
       </div>
 
-      <!-- Dial visualization -->
       <div class="dial-wrapper">
         <div class="dial">
           <div class="dial-ticks" id="dialTicks"></div>
@@ -550,185 +540,28 @@
     </div>
   </div>
 
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
   <script>
-    /* ---------------- DICHOTOMY LISTS ---------------- */
+    // 🔴 Paste YOUR Firebase config values here:
+    const firebaseConfig = {
+  apiKey: "AIzaSyBxxMnSQIHU6f9ifpy_RYvUtZhcDQdj4Qg",
+  authDomain: "wavelength-game-48f1f.firebaseapp.com",
+  projectId: "wavelength-game-48f1f",
+  storageBucket: "wavelength-game-48f1f.firebasestorage.app",
+  messagingSenderId: "148853032160",
+  appId: "1:148853032160:web:8632440088b6d49148fc85",
+  measurementId: "G-NFE2JXDVGB"
+};
 
-    const easyDichotomies = [
-      ["Cold","Hot"],
-      ["Light","Dark"],
-      ["Wet","Dry"],
-      ["Hard","Soft"],
-      ["Round","Square"],
-      ["Pointy","Round"],
-      ["Spicy","Mild"],
-      ["Firm","Limp"],
-      ["Scented","Unscented"],
-      ["Vertical","Horizontal"],
-      ["Tastes good","Tastes bad"],
-      ["Smells good","Smells bad"],
-      ["Clean","Dirty"],
-      ["Healthy","Unhealthy"],
-      ["Fancy","Plain"],
-      ["High quality","Low quality"],
-      ["Smooth","Rough"],
-      ["Useful","Useless"],
-      ["Important","Unimportant"],
-      ["Hard to do","Easy to do"],
-      ["Good for you","Bad for you"],
-      ["Good gift","Bad gift"],
-      ["Good candy","Bad candy"],
-      ["Feels good","Feels bad"],
-      ["Easy to use","Difficult to use"],
-      ["Easy to remember","Hard to remember"],
-      ["Easy to pronounce","Hard to pronounce"],
-      ["Easy to sit on","Hard to sit on"],
-      ["Too big","Too small"],
-      ["Long","Short"],
-      ["Too much","Not enough"],
-      ["Meal","Snack"],
-      ["Film","Movie"],
-      ["Drama","Comedy"],
-      ["Dog person","Cat person"],
-      ["Extrovert","Introvert"],
-      ["Dork","Geek"],
-      ["Cool","Uncool"],
-      ["Fashionable","Unfashionable"],
-      ["Happy song","Sad song"],
-      ["Happy movie","Sad movie"],
-      ["Good movie","Bad movie"],
-      ["Good actor","Bad actor"],
-      ["Good music","Bad music"],
-      ["Good TV show","Bad TV show"],
-      ["Wet food","Dry food"],
-      ["Smelly (good)","Smelly (bad)"],
-      ["Game","Sport"],
-      ["Clean food","Messy food"],
-      ["Tiny","Small"],
-      ["Vegetable","Fruit"],
-      ["Strange","Weird"],
-      ["Cat name","Dog name"]
-    ];
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    // shared game doc – everyone uses this same slider state
+    const sliderDoc = db.collection("games").doc("main");
 
-    const mediumDichotomies = [
-      ["Colorful","Colorless"],
-      ["Expensive","Cheap"],
-      ["Common","Rare"],
-      ["Famous","Unknown"],
-      ["Durable","Fragile"],
-      ["Best day of the year","Worst day of the year"],
-      ["Good habit","Bad habit"],
-      ["Talented","Untalented"],
-      ["Classy","Not classy"],
-      ["Flexible","Inflexible"],
-      ["Exotic pet","Normal pet"],
-      ["Adventure movie","Action movie"],
-      ["Want","Need"],
-      ["Weird thing to own","Normal thing to own"],
-      ["Mandatory","Optional"],
-      ["Extraordinary","Ordinary"],
-      ["Fancy","Plain"],
-      ["Good reputation","Bad reputation"],
-      ["Well made","Poorly made"],
-      ["A sandwich","Not a sandwich"],
-      ["Loud place","Quiet place"],
-      ["Safe","Dangerous"],
-      ["Irreplaceable","Replaceable"],
-      ["Overrated","Underrated"],
-      ["Forgiveable","Unforgiveable"],
-      ["Homogeneous","Heterogeneous"],
-      ["Popular","Unpopular"],
-      ["Beautiful word","Ugly word"],
-      ["Natural","Unnatural"],
-      ["Original","Derivative"],
-      ["Benefits everyone","Benefits you"],
-      ["Powerful","Powerless"],
-      ["Serious topic","Funny topic"],
-      ["News","Gossip"],
-      ["Exclusive","Inclusive"],
-      ["Unexpected","Expected"],
-      ["Hard subject","Easy subject"],
-      ["Smooth","Rough"],
-      ["Overrated movie","Underrated movie"],
-      ["Everybody does it","Nobody does it"],
-      ["Round","Square"],
-      ["Better cold","Better hot"],
-      ["Haute cuisine","Basic food"],
-      ["Effective","Ineffective"],
-      ["Permanent","Temporary"],
-      ["Doesn’t look like a person","Looks like a person"],
-      ["Tastes good","Tastes bad"],
-      ["Popular activity","Unpopular activity"],
-      ["Whole","Divided"],
-      ["Reliable","Unreliable"],
-      ["Stable","Unstable"],
-      ["Pointy animal","Round animal"],
-      ["Classic","Fad"],
-      ["Useful invention","Useless invention"],
-      ["Exciting","Boring"],
-      ["Overrated thing to do","Underrated thing to do"],
-      ["Useful in an emergency","Useless in an emergency"],
-      ["Priceless","Worthless"],
-      ["Weird greeting","Normal greeting"],
-      ["Formal event","Casual event"],
-      ["Good investment","Bad investment"],
-      ["Best chore","Worst chore"],
-      ["Overrated book","Underrated book"],
-      ["Overrated game","Underrated game"]
-    ];
-
-    const hardDichotomies = [
-      ["Essential","Inessential"],
-      ["Flavorful","Flavorless"],
-      ["Fascinating topic","Boring topic"],
-      ["Sci-Fi","Fantasy"],
-      ["Overpaid","Underpaid"],
-      ["Overrated skill","Underrated skill"],
-      ["Encouraged","Forbidden"],
-      ["Historically irrelevant","Historically important"],
-      ["Movie was better","Book was better"],
-      ["Career","Job"],
-      ["Hated","Loved"],
-      ["Dark Side of the Force","Light Side of the Force"],
-      ["Utopia","Dystopia"],
-      ["Overrated thing to own","Underrated thing to own"],
-      ["Physical activity","Mental activity"],
-      ["Controversial topic","Uncontroversial topic"],
-      ["Overrated letter","Underrated letter"],
-      ["Fancy","Plain"],
-      ["Culturally insignificant","Culturally significant"],
-      ["Greatest athlete","Worst athlete"],
-      ["Bad influence","Role model"],
-      ["Useful major","Useless major"],
-      ["Good use of time","Waste of time"],
-      ["Star Trek","Star Wars"],
-      ["Mass-produced","Artisanal"],
-      ["Good superpower","Bad superpower"],
-      ["Believable","Unbelievable"],
-      ["Movie Godzilla improves","Movie Godzilla ruins"],
-      ["Virtue","Vice"],
-      ["Overrated musician","Underrated musician"],
-      ["Nurture","Nature"],
-      ["Infinite","Limited"],
-      ["Public knowledge","Secret"],
-      ["Best year","Worst year"],
-      ["Well-known fact","Little-known fact"],
-      ["Mobile","Stationary"],
-      ["Skill","Talent"],
-      ["Best era to travel to","Worst era to travel to"],
-      ["The best","The worst"],
-      ["Large number","Small number"],
-      ["Avant-garde","Old-fashioned"],
-      ["Pseudoscience","Science"],
-      ["Commerce","Art"],
-      ["Good advice","Bad advice"],
-      ["Radical","Traditional"],
-      ["Shallow thought","Deep thought"],
-      ["Good school","Bad school"],
-      ["Always on time","Never on time"],
-      ["Good Disney character","Bad Disney character"]
-    ];
-
-    /* ---------------- GAME STATE ---------------- */
+    /* ------------ Game state + DOM references ------------ */
 
     let target = null;
     let roundComplete = false;
@@ -767,7 +600,6 @@
     const pointsText = document.getElementById("pointsText");
     const scoreboardUpdateText = document.getElementById("scoreboardUpdateText");
     const spectrumInput = document.getElementById("spectrum");
-
     const difficultyButtons = document.querySelectorAll(".difficulty-btn");
 
     function getWinningScore() {
@@ -780,7 +612,6 @@
     }
 
     function angleFromValue(v) {
-      // Map 0–100 to -90° to +90°
       return (v / 100) * 180 - 90;
     }
 
@@ -797,7 +628,6 @@
         <option value="A">${aName}</option>
         <option value="B">${bName}</option>
       `;
-
       activeTeamSelect.value = current === "B" ? "B" : "A";
       updateScoreDisplay();
     }
@@ -861,6 +691,114 @@
       });
     }
 
+    /* -------- Dichotomy lists (Easy / Medium / Hard) -------- */
+
+    const easyDichotomies = [
+      ["Cold","Hot"],["Light","Dark"],["Wet","Dry"],["Hard","Soft"],
+      ["Round","Square"],["Pointy","Round"],["Spicy","Mild"],["Firm","Limp"],
+      ["Scented","Unscented"],["Vertical","Horizontal"],["Tastes good","Tastes bad"],
+      ["Smells good","Smells bad"],["Clean","Dirty"],["Healthy","Unhealthy"],
+      ["Fancy","Plain"],["High quality","Low quality"],["Smooth","Rough"],
+      ["Useful","Useless"],["Important","Unimportant"],["Hard to do","Easy to do"],
+      ["Good for you","Bad for you"],["Good gift","Bad gift"],
+      ["Good candy","Bad candy"],["Feels good","Feels bad"],
+      ["Easy to use","Difficult to use"],["Easy to remember","Hard to remember"],
+      ["Easy to pronounce","Hard to pronounce"],["Easy to sit on","Hard to sit on"],
+      ["Too big","Too small"],["Long","Short"],["Too much","Not enough"],
+      ["Meal","Snack"],["Film","Movie"],["Drama","Comedy"],
+      ["Dog person","Cat person"],["Extrovert","Introvert"],["Dork","Geek"],
+      ["Cool","Uncool"],["Fashionable","Unfashionable"],["Happy song","Sad song"],
+      ["Happy movie","Sad movie"],["Good movie","Bad movie"],
+      ["Good actor","Bad actor"],["Good music","Bad music"],
+      ["Good TV show","Bad TV show"],["Wet food","Dry food"],
+      ["Smelly (good)","Smelly (bad)"],["Game","Sport"],
+      ["Clean food","Messy food"],["Tiny","Small"],["Vegetable","Fruit"],
+      ["Strange","Weird"],["Cat name","Dog name"]
+    ];
+
+    const mediumDichotomies = [
+      ["Colorful","Colorless"],["Expensive","Cheap"],["Common","Rare"],
+      ["Famous","Unknown"],["Durable","Fragile"],
+      ["Best day of the year","Worst day of the year"],
+      ["Good habit","Bad habit"],["Talented","Untalented"],
+      ["Classy","Not classy"],["Flexible","Inflexible"],
+      ["Exotic pet","Normal pet"],["Adventure movie","Action movie"],
+      ["Want","Need"],["Weird thing to own","Normal thing to own"],
+      ["Mandatory","Optional"],["Extraordinary","Ordinary"],
+      ["Fancy","Plain"],["Good reputation","Bad reputation"],
+      ["Well made","Poorly made"],["A sandwich","Not a sandwich"],
+      ["Loud place","Quiet place"],["Safe","Dangerous"],
+      ["Irreplaceable","Replaceable"],["Overrated","Underrated"],
+      ["Forgiveable","Unforgiveable"],["Homogeneous","Heterogeneous"],
+      ["Popular","Unpopular"],["Beautiful word","Ugly word"],
+      ["Natural","Unnatural"],["Original","Derivative"],
+      ["Benefits everyone","Benefits you"],["Powerful","Powerless"],
+      ["Serious topic","Funny topic"],["News","Gossip"],
+      ["Exclusive","Inclusive"],["Unexpected","Expected"],
+      ["Hard subject","Easy subject"],["Smooth","Rough"],
+      ["Overrated movie","Underrated movie"],
+      ["Everybody does it","Nobody does it"],
+      ["Round","Square"],["Better cold","Better hot"],
+      ["Haute cuisine","Basic food"],["Effective","Ineffective"],
+      ["Permanent","Temporary"],
+      ["Doesn’t look like a person","Looks like a person"],
+      ["Tastes good","Tastes bad"],
+      ["Popular activity","Unpopular activity"],
+      ["Whole","Divided"],["Reliable","Unreliable"],
+      ["Stable","Unstable"],["Pointy animal","Round animal"],
+      ["Classic","Fad"],["Useful invention","Useless invention"],
+      ["Exciting","Boring"],
+      ["Overrated thing to do","Underrated thing to do"],
+      ["Useful in an emergency","Useless in an emergency"],
+      ["Priceless","Worthless"],["Weird greeting","Normal greeting"],
+      ["Formal event","Casual event"],["Good investment","Bad investment"],
+      ["Best chore","Worst chore"],["Overrated book","Underrated book"],
+      ["Overrated game","Underrated game"]
+    ];
+
+    const hardDichotomies = [
+      ["Essential","Inessential"],["Flavorful","Flavorless"],
+      ["Fascinating topic","Boring topic"],["Sci-Fi","Fantasy"],
+      ["Overpaid","Underpaid"],["Overrated skill","Underrated skill"],
+      ["Encouraged","Forbidden"],
+      ["Historically irrelevant","Historically important"],
+      ["Movie was better","Book was better"],["Career","Job"],
+      ["Hated","Loved"],
+      ["Dark Side of the Force","Light Side of the Force"],
+      ["Utopia","Dystopia"],
+      ["Overrated thing to own","Underrated thing to own"],
+      ["Physical activity","Mental activity"],
+      ["Controversial topic","Uncontroversial topic"],
+      ["Overrated letter","Underrated letter"],["Fancy","Plain"],
+      ["Culturally insignificant","Culturally significant"],
+      ["Greatest athlete","Worst athlete"],
+      ["Bad influence","Role model"],
+      ["Useful major","Useless major"],
+      ["Good use of time","Waste of time"],
+      ["Star Trek","Star Wars"],
+      ["Mass-produced","Artisanal"],
+      ["Good superpower","Bad superpower"],
+      ["Believable","Unbelievable"],
+      ["Movie Godzilla improves","Movie Godzilla ruins"],
+      ["Virtue","Vice"],
+      ["Overrated musician","Underrated musician"],
+      ["Nurture","Nature"],["Infinite","Limited"],
+      ["Public knowledge","Secret"],["Best year","Worst year"],
+      ["Well-known fact","Little-known fact"],
+      ["Mobile","Stationary"],["Skill","Talent"],
+      ["Best era to travel to","Worst era to travel to"],
+      ["The best","The worst"],
+      ["Large number","Small number"],
+      ["Avant-garde","Old-fashioned"],
+      ["Pseudoscience","Science"],
+      ["Commerce","Art"],["Good advice","Bad advice"],
+      ["Radical","Traditional"],
+      ["Shallow thought","Deep thought"],
+      ["Good school","Bad school"],
+      ["Always on time","Never on time"],
+      ["Good Disney character","Bad Disney character"]
+    ];
+
     function pickRandomDichotomy() {
       let list;
       if (currentDifficulty === "easy") list = easyDichotomies;
@@ -881,17 +819,15 @@
       targetEl.dataset.visible = "false";
       targetEl.textContent = "???";
 
-      guessSlider.value = 50;
-      guessValue.textContent = "50";
-      updateDialFromValue(50);
-
       resultsBox.style.display = "none";
-
       submitGuessBtn.disabled = false;
       toggleTargetBtn.disabled = false;
 
       buildTicksForTarget();
       dialTicks.style.opacity = 0;
+
+      // reset shared slider to center (via Firestore)
+      sliderDoc.set({ value: 50 });
     }
 
     function toggleTargetVisibility() {
@@ -1017,7 +953,6 @@
       submitGuessBtn.disabled = false;
       toggleTargetBtn.disabled = false;
 
-      // Reset difficulty to Medium
       currentDifficulty = "medium";
       difficultyButtons.forEach(b => b.classList.remove("active-difficulty"));
       document.getElementById("mediumBtn").classList.add("active-difficulty");
@@ -1028,15 +963,36 @@
       generateNewTarget();
     }
 
-    /* ---------------- EVENT LISTENERS ---------------- */
+    /* -------- Real-time slider sync via Firestore -------- */
+
+    let updatingFromFirestore = false;
+
+    sliderDoc.onSnapshot(docSnap => {
+      if (!docSnap.exists()) {
+        sliderDoc.set({ value: 50 });
+        return;
+      }
+      const data = docSnap.data();
+      const v = typeof data.value === "number" ? data.value : 50;
+
+      updatingFromFirestore = true;
+      guessSlider.value = v;
+      guessValue.textContent = v;
+      updateDialFromValue(v);
+      updatingFromFirestore = false;
+    });
 
     guessSlider.addEventListener("input", (e) => {
       const val = parseInt(e.target.value, 10);
       guessValue.textContent = val;
       updateDialFromValue(val);
+      if (!updatingFromFirestore) {
+        sliderDoc.set({ value: val });
+      }
     });
 
-    // New Round: switch teams, then new target (dichotomy chosen separately)
+    /* -------- Other event listeners (local only) -------- */
+
     newRoundBtn.addEventListener("click", () => {
       if (!gameOver) {
         activeTeamSelect.value = activeTeamSelect.value === "A" ? "B" : "A";
@@ -1055,7 +1011,6 @@
     activeTeamSelect.addEventListener("change", updateScoreDisplay);
     winningScoreInput.addEventListener("change", getWinningScore);
 
-    // Manual score editing
     teamAScoreEl.addEventListener("change", () => {
       let v = parseInt(teamAScoreEl.value, 10);
       if (isNaN(v) || v < 0) v = 0;
@@ -1074,7 +1029,6 @@
       updateScoreDisplay();
     });
 
-    // Difficulty buttons
     difficultyButtons.forEach(btn => {
       btn.addEventListener("click", () => {
         difficultyButtons.forEach(b => b.classList.remove("active-difficulty"));
@@ -1083,14 +1037,14 @@
       });
     });
 
-    // New Card button
     newDichotomyBtn.addEventListener("click", pickRandomDichotomy);
 
-    // Initialize
+    // Init UI
     updateDialFromValue(50);
     refreshTeamDropdown();
     activeTeamSelect.value = "A";
     updateScoreDisplay();
+    // first time: create target & center slider
     generateNewTarget();
   </script>
 </body>
